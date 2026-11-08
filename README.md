@@ -1,20 +1,21 @@
-# AES-128 in CTR mode, sequential vs OpenMP
+# AES-128 in CTR mode, sequential and with OpenMP
 
-**AES-128 implemented by hand in C (S-box, ShiftRows, MixColumns, key expansion), then parallelised with OpenMP.**
+In this project I implemented AES-128 by hand in C (the S-box, ShiftRows, MixColumns and the key
+expansion), then made it faster with OpenMP.
 
-Counter (CTR) mode turns AES into a stream cipher where every 16-byte block is encrypted independently
-(`block_i XOR AES(key, nonce || i)`). Since no block depends on another, the blocks can be spread across threads
-with a single `#pragma omp parallel for`, which is what this project measures.
+I used counter mode (CTR) because it encrypts every 16-byte block on its own: each block is combined with
+`AES(key, nonce || i)`. Since no block depends on another one, the blocks can be shared between threads
+with a single `#pragma omp parallel for`. That's what this project measures.
 
 ## Files
 
 | File | What it is |
 |---|---|
-| `AES-CTR_Projet/sequential.c` | reference implementation, one thread |
-| `AES-CTR_Projet/openMP.c` | same algorithm, blocks encrypted in parallel; prints the elapsed time (`omp_get_wtime`) |
-| `AES-CTR_Projet/file_to_encrypt.txt` | input used for the timings |
+| `AES-CTR_Projet/sequential.c` | the reference version, on one thread |
+| `AES-CTR_Projet/openMP.c` | the same algorithm with the blocks encrypted in parallel; it prints the time taken (`omp_get_wtime`) |
+| `AES-CTR_Projet/file_to_encrypt.txt` | the input file used for the timings |
 
-## Run
+## Running it
 
 ```bash
 cd AES-CTR_Projet
@@ -22,6 +23,7 @@ gcc -O2 sequential.c -o sequential && ./sequential
 gcc -O2 -fopenmp openMP.c -o openmp && OMP_NUM_THREADS=8 ./openmp
 ```
 
-Change `OMP_NUM_THREADS` to see how the time scales with the number of cores.
+You can change `OMP_NUM_THREADS` to see how the time changes with the number of cores.
 
-*Educational implementation: use a vetted library (OpenSSL, libsodium) for real encryption.*
+This is a learning project about how AES and parallelism work. For real encryption, use a tested library
+like OpenSSL or libsodium.
